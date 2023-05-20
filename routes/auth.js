@@ -1,39 +1,59 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const { User } = require('../models');
+const bcrypt = require('bcrypt');
 
-// Route for user login
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // Find the user with the provided username
+    // Find the user by username
     const user = await User.findOne({ where: { username } });
 
-    // Check if the user exists and the password is correct
-    if (!user || !user.validPassword(password)) {
-      res.status(401).json({ message: 'Invalid username or password' });
+    if (!user) {
+      // User not found
+      res.status(401).json({ error: 'Invalid credentials' });
+      return;
+    }
+
+    // Compare the provided password with the hashed password stored in the database
+    const match = await bcrypt.compare(password, user.password);
+
+    if (!match) {
+      // Passwords don't match
+      res.status(401).json({ error: 'Invalid credentials' });
       return;
     }
 
     // Store the user ID in the session
     req.session.userId = user.id;
-    res.status(200).json({ message: 'Login successful' });
+
+    // Send a response or redirect to a different route
+    res.json({ message: 'Login successful' });
   } catch (err) {
-    res.status(500).json(err);
+    // Handle authentication errors
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Route for user logout
-router.post('/logout', (req, res) => {
-  // Destroy the session and remove the userId
-  req.session.destroy((err) => {
-    if (err) {
-      res.status(500).json(err);
-      return;
-    }
-    res.status(200).json({ message: 'Logout successful' });
-  });
+router.post('/register', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create the user in the database with the hashed password
+    const user = await User.create({ username, password: hashedPassword });
+
+    // Store the user ID in the session
+    req.session.userId = user.id;
+
+    // Send a response or redirect to a different route
+    res.json({ message: 'Registration successful' });
+  } catch (err) {
+    // Handle registration errors
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 module.exports = router;

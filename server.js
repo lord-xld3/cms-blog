@@ -1,7 +1,10 @@
 const express = require('express');
+const hbs = require('hbs');
+const { engine } = require('express-handlebars');
 const session = require('express-session');
-const exphbs = require('express-handlebars');
 const path = require('path');
+const notFoundMiddleware = require('./middleware/notFoundMiddleware');
+const errorMiddleware = require('./middleware/errorMiddleware');
 
 // Import routes
 const homeRoutes = require('./routes/home');
@@ -11,17 +14,25 @@ const authRoutes = require('./routes/auth');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Configure Handlebars as the template engine
-app.engine('handlebars', exphbs());
-app.set('view engine', 'handlebars');
+// Configure hbs (Handlebars) as the view engine
+app.engine('hbs', engine({ extname: 'hbs', defaultLayout: 'main' }));
+app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
+
+// Configure hbs partials
+hbs.registerPartials(path.join(__dirname, 'views/partials'));
 
 // Configure session middleware
 app.use(
   session({
-    secret: 'your-secret-key',
+    secret: 'your-secret-key', // Replace with your own secret key
     resave: false,
     saveUninitialized: true,
+    cookie: {
+      secure: false, // Set to true if using HTTPS
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // Session duration in milliseconds (e.g., 24 hours)
+    },
   })
 );
 
@@ -37,7 +48,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Define routes
 app.use('/', homeRoutes);
 app.use('/dashboard', dashboardRoutes);
-app.use('/auth', authRoutes);
+app.use('/', authRoutes);
+
+app.use(notFoundMiddleware);
+app.use(errorMiddleware);
 
 // Start the server
 app.listen(PORT, () => {
