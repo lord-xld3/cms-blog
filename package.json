@@ -4,7 +4,8 @@
   "description": "CMS-style blog site",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "seed": "node seeds/index.js"
   },
   "repository": {
     "type": "git",
@@ -16,5 +17,14 @@
   "bugs": {
     "url": "https://github.com/lord-xld3/cms-blog/issues"
   },
-  "homepage": "https://github.com/lord-xld3/cms-blog#readme"
+  "homepage": "https://github.com/lord-xld3/cms-blog#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "handlebars": "^4.7.7",
+    "mysql2": "^3.3.1",
+    "sequelize": "^6.31.1"
+  }
 }
