@@ -1,6 +1,19 @@
-// dashboard.js
 const router = require('express').Router();
 const { Post } = require('../models');
+
+// Authentication middleware
+const authenticate = (req, res, next) => {
+  if (req.session.userId) {
+    // User is authenticated, proceed to the next middleware or route handler
+    next();
+  } else {
+    // User is not authenticated, redirect to the login page or any other desired route
+    res.redirect('/login');
+  }
+};
+
+// Apply the authentication middleware to the entire dashboard router
+router.use(authenticate);
 
 // Get all posts
 router.get('/', async (req, res) => {
@@ -46,7 +59,7 @@ router.get('/edit/:id', async (req, res) => {
   try {
     const postId = req.params.id;
     const post = await Post.findByPk(postId);
-    
+
     if (!post) {
       res.render('notFound');
       return;
@@ -84,7 +97,5 @@ router.post('/edit/:id', async (req, res) => {
     res.render('error'); // Render the error page
   }
 });
-
-
 
 module.exports = router;

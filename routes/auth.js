@@ -62,4 +62,12 @@ router.post('/register', async (req, res) => {
   }
 });
 
+router.get('/logout', (req, res) => {
+  // Clear the user ID from the session
+  req.session.userId = null;
+
+  // Redirect to the login page or any other desired route
+  res.redirect('/');
+});
+
 module.exports = router;
