@@ -7,3 +7,10 @@
     <p>{{this.dataValues.content}}</p>
   </div>
 {{/each}}
+
+{{#if isAuthenticated}}
+  <a href="/dashboard">Go to Dashboard</a>
+{{else}}
+  <a href="/login">Log In</a>
+  <a href="/register">Register</a>
+{{/if}}

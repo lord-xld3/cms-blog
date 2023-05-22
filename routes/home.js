@@ -1,5 +1,3 @@
-// homeRoutes.js
-
 const router = require('express').Router();
 const { Post, User, Comment } = require('../models');
 
@@ -10,7 +8,11 @@ router.get('/', async (req, res) => {
       include: [{ model: User, attributes: ['username'] }],
       order: [['createdAt', 'DESC']],
     });
-    res.render('home', { posts });
+
+    // Check if the user is authenticated
+    const isAuthenticated = req.session.userId ? true : false;
+
+    res.render('home', { posts, isAuthenticated });
   } catch (error) {
     console.error(error);
     res.render('error'); // Render the error page
@@ -26,9 +28,10 @@ router.get('/posts/new', (req, res) => {
 router.post('/posts/new', async (req, res) => {
   try {
     const { title, content } = req.body;
+    const userId = req.session.userId; // Get the userId from the session
 
-    // Create the new post
-    await Post.create({ title, content });
+    // Create the new post with the userId
+    await Post.create({ title, content, userId });
 
     res.redirect('/dashboard'); // Redirect to the dashboard after creating the post
   } catch (error) {
@@ -36,6 +39,7 @@ router.post('/posts/new', async (req, res) => {
     res.render('error'); // Render the error page
   }
 });
+
 
 // GET /posts/:id - Single blog post route
 router.get('/posts/:id', async (req, res) => {

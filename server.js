@@ -28,11 +28,6 @@ app.use(
     secret: 'your-secret-key', // Replace with your own secret key
     resave: false,
     saveUninitialized: true,
-    cookie: {
-      secure: false, // Set to true if using HTTPS
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // Session duration in milliseconds (e.g., 24 hours)
-    },
   })
 );
 
@@ -47,10 +42,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Define routes
 app.use('/', homeRoutes);
+app.use('/', authRoutes);
 app.use('/dashboard', dashboardRoutes);
-app.use('/auth', authRoutes);
 
-
+// Use the error and not found middleware after the routes
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
 
