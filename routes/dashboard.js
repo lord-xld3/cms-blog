@@ -60,7 +60,7 @@ router.get('/edit/:id', async (req, res) => {
 });
 
 // Update a post (handle the form submission)
-router.post('/:id/edit', async (req, res) => {
+router.post('/edit/:id', async (req, res) => {
   try {
     const postId = req.params.id;
     const { title, content } = req.body;
@@ -84,6 +84,7 @@ router.post('/:id/edit', async (req, res) => {
     res.render('error'); // Render the error page
   }
 });
+
 
 
 module.exports = router;

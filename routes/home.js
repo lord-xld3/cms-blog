@@ -1,5 +1,7 @@
+// homeRoutes.js
+
 const router = require('express').Router();
-const { Post, User } = require('../models');
+const { Post, User, Comment } = require('../models');
 
 // GET / - Homepage route
 router.get('/', async (req, res) => {
@@ -9,6 +11,26 @@ router.get('/', async (req, res) => {
       order: [['createdAt', 'DESC']],
     });
     res.render('home', { posts });
+  } catch (error) {
+    console.error(error);
+    res.render('error'); // Render the error page
+  }
+});
+
+// GET /posts/new - Render the newPost form
+router.get('/posts/new', (req, res) => {
+  res.render('newPost');
+});
+
+// POST /posts/new - Handle the form submission to create a new post
+router.post('/posts/new', async (req, res) => {
+  try {
+    const { title, content } = req.body;
+
+    // Create the new post
+    await Post.create({ title, content });
+
+    res.redirect('/dashboard'); // Redirect to the dashboard after creating the post
   } catch (error) {
     console.error(error);
     res.render('error'); // Render the error page
@@ -36,11 +58,6 @@ router.get('/posts/:id', async (req, res) => {
     console.error(error);
     res.render('error'); // Render the error page
   }
-});
-
-// GET /posts/new - New blog post form route
-router.get('/posts/new', (req, res) => {
-  res.render('newPost');
 });
 
 // GET /posts/edit/:id - Edit blog post form route
