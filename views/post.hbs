@@ -1,0 +1,13 @@
+<!-- post.hbs -->
+<h1>{{post.dataValues.title}}</h1>
+<p>{{post.dataValues.content}}</p>
+<p>Created by: {{post.User.dataValues.username}}</p>
+
+<h2>Comments</h2>
+{{#each post.Comments}}
+  <div class="comment">
+    <p>{{this.dataValues.content}}</p>
+    <p>Comment by: {{this.User.dataValues.username}}</p>
+    <p>Posted on: {{this.dataValues.createdAt}}</p>
+  </div>
+{{/each}}

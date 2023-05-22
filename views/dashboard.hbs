@@ -1,0 +1,27 @@
+<!-- dashboard.hbs -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Dashboard</h1>
+
+    <a href="/dashboard/create">Create New Post</a>
+
+    <h2>Existing Posts:</h2>
+    {{#each posts}}
+      <div class="post">
+        <h3>{{this.dataValues.title}}</h3>
+        <p>{{this.dataValues.content}}</p>
+        <p>Created at: {{this.dataValues.createdAt}}</p>
+        <p>Author: {{this.User.dataValues.username}}</p>
+        <a href="/dashboard/edit/{{this.dataValues.id}}">Edit</a>
+        <a href="/dashboard/delete/{{this.dataValues.id}}">Delete</a>
+      </div>
+    {{/each}}
+
+    <a href="/logout">Logout</a>
+</body>
+</html>

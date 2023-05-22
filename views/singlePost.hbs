@@ -1,0 +1,20 @@
+<!-- singlePost.hbs -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Single Post</title>
+</head>
+<body>
+    <h1>Single Post</h1>
+
+    <div class="post">
+        <h2>{{post.dataValues.title}}</h2>
+        <p>{{post.dataValues.content}}</p>
+        <p>Created at: {{post.dataValues.createdAt}}</p>
+        <p>Author: {{post.User.dataValues.username}}</p>
+    </div>
+
+    <a href="/dashboard">Go back to Dashboard</a>
+</body>
+</html>

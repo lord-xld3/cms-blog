@@ -48,7 +48,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Define routes
 app.use('/', homeRoutes);
 app.use('/dashboard', dashboardRoutes);
-app.use('/', authRoutes);
+app.use('/auth', authRoutes);
+
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
