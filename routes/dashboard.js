@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { Post } = require('../models');
+const { Post, User } = require('../models');
 
 // Authentication middleware
 const authenticate = (req, res, next) => {
@@ -18,13 +18,26 @@ router.use(authenticate);
 // Get all posts
 router.get('/', async (req, res) => {
   try {
-    const posts = await Post.findAll();
-    res.render('dashboard', { posts });
+    const posts = await Post.findAll({
+      include: [{ model: User, attributes: ['username'] }],
+    });
+
+    // Make the user object an "own property" by formatting the data
+    const formattedPosts = posts.map(post => {
+      return {
+        ...post.get(), // Spread the post's properties
+        user: { ...post.user.get() }, // Spread the user's properties
+      };
+    });
+
+    res.render('dashboard', { posts: formattedPosts });
   } catch (error) {
     console.error(error);
     res.render('error'); // Render the error page
   }
 });
+
+
 
 // Get a specific post by ID
 router.get('/:id', async (req, res) => {

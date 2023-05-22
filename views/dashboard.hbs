@@ -13,12 +13,12 @@
     <h2>Existing Posts:</h2>
     {{#each posts}}
       <div class="post">
-        <h3>{{this.dataValues.title}}</h3>
-        <p>{{this.dataValues.content}}</p>
-        <p>Created at: {{this.dataValues.createdAt}}</p>
-        <p>Author: {{this.User.dataValues.username}}</p>
-        <a href="/dashboard/edit/{{this.dataValues.id}}">Edit</a>
-        <a href="/dashboard/delete/{{this.dataValues.id}}">Delete</a>
+        <h3>{{this.title}}</h3>
+        <p>{{this.content}}</p>
+        <p>Created at: {{this.createdAt}}</p>
+        <p>Author: {{this.user.username}}</p>
+        <a href="/dashboard/edit/{{this.id}}">Edit</a>
+        <a href="/dashboard/delete/{{this.id}}">Delete</a>
       </div>
     {{/each}}
 

@@ -28,7 +28,13 @@ router.get('/posts/new', (req, res) => {
 router.post('/posts/new', async (req, res) => {
   try {
     const { title, content } = req.body;
-    const userId = req.session.userId; // Get the userId from the session
+    const userId = req.session.userId;
+
+    // Check if userId exists
+    if (!userId) {
+      res.redirect('/login'); // Redirect to the login page if user is not logged in
+      return;
+    }
 
     // Create the new post with the userId
     await Post.create({ title, content, userId });
@@ -39,6 +45,7 @@ router.post('/posts/new', async (req, res) => {
     res.render('error'); // Render the error page
   }
 });
+
 
 
 // GET /posts/:id - Single blog post route
