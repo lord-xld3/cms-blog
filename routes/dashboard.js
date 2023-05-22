@@ -4,10 +4,8 @@ const { Post, User } = require('../models');
 // Authentication middleware
 const authenticate = (req, res, next) => {
   if (req.session.userId) {
-    // User is authenticated, proceed to the next middleware or route handler
     next();
   } else {
-    // User is not authenticated, redirect to the login page or any other desired route
     res.redirect('/login');
   }
 };
@@ -22,76 +20,120 @@ router.get('/', async (req, res) => {
       include: [{ model: User, attributes: ['username'] }],
     });
 
-    // Make the user object an "own property" by formatting the data
-    const formattedPosts = posts.map(post => {
-      return {
-        ...post.get(), // Spread the post's properties
-        user: { ...post.user.get() }, // Spread the user's properties
-      };
-    });
+    const formattedPosts = posts.map(post => ({
+      ...post.get(),
+      user: { ...post.user.get() },
+    }));
 
     res.render('dashboard', { posts: formattedPosts });
   } catch (error) {
     console.error(error);
-    res.render('error'); // Render the error page
+    res.render('error', { error: { message: 'Failed to load posts' } });
   }
 });
 
-
-
 // Get a specific post by ID
-router.get('/:id', async (req, res) => {
+router.get('/posts/:id', async (req, res) => {
   try {
     const postId = req.params.id;
-    const post = await Post.findByPk(postId);
-    if (post) {
-      res.render('singlePost', { post });
-    } else {
+    const post = await Post.findByPk(postId, {
+      include: [{ model: User, attributes: ['username'] }],
+    });
+
+    if (!post) {
       res.render('notFound');
+      return;
     }
+
+    const formattedPost = {
+      ...post.get(),
+      user: { ...post.user.get() },
+    };
+
+    res.render('singlePost', { post: formattedPost });
   } catch (error) {
     console.error(error);
-    res.render('error'); // Render the error page
+    res.render('error', { error: { message: 'Post not found' } });
+  }
+});
+
+// Create a new post (render the form)
+router.get('/posts/new', (req, res) => {
+  res.render('newPost');
+});
+
+// Create a new post (handle the form submission)
+router.post('/posts/new', async (req, res) => {
+  try {
+    const { title, content } = req.body;
+    const userId = req.session.userId;
+    
+    const post = await Post.create({ title, content, userId });
+
+    res.redirect(`/dashboard/posts/${post.id}`);
+  } catch (error) {
+    console.error(error);
+    res.render('error', { error: { message: 'Failed to create new post' } });
   }
 });
 
 // Delete a post
-router.delete('/:id', async (req, res) => {
+router.delete('/posts/:id', async (req, res) => {
   try {
     const postId = req.params.id;
-    await Post.destroy({ where: { id: postId } });
+    const post = await Post.findByPk(postId);
+
+    // Check if the post exists
+    if (!post) {
+      res.render('error', { error: { message: 'Post not found' } });
+      return;
+    }
+
+    // Check if the current user is the author of the post
+    if (req.session.userId !== post.userId) {
+      res.render('error', { error: { message: 'You are not authorized to delete this post' } });
+      return;
+    }
+
+    // Delete the post
+    await post.destroy();
     res.sendStatus(204);
   } catch (error) {
     console.error(error);
-    res.render('error'); // Render the error page
+    res.render('error', { error: { message: 'Failed to delete post' } });
   }
 });
 
+
 // Update a post (render the edit post form)
-router.get('/edit/:id', async (req, res) => {
+router.get('/posts/edit/:id', async (req, res) => {
   try {
     const postId = req.params.id;
     const post = await Post.findByPk(postId);
 
     if (!post) {
       res.render('notFound');
+      return;
+    }
+
+    if (req.session.userId !== post.userId) {
+      res.render('error', { error: { message: 'You are not authorized to edit this post' } });
       return;
     }
 
     res.render('editPost', { post });
   } catch (error) {
     console.error(error);
-    res.render('error');
+    res.render('error', { error: { message: 'Failed to load edit post form' } });
   }
 });
 
 // Update a post (handle the form submission)
-router.post('/edit/:id', async (req, res) => {
+router.post('/posts/edit/:id', async (req, res) => {
   try {
     const postId = req.params.id;
     const { title, content } = req.body;
 
-    // Find the post by its ID
     const post = await Post.findByPk(postId);
 
     if (!post) {
@@ -99,15 +141,14 @@ router.post('/edit/:id', async (req, res) => {
       return;
     }
 
-    // Update the post with the new title and content
     post.title = title;
     post.content = content;
     await post.save();
 
-    res.redirect(`/dashboard/${postId}`);
+    res.redirect(`/dashboard/posts/${postId}`);
   } catch (error) {
     console.error(error);
-    res.render('error'); // Render the error page
+    res.render('error', { error: { message: 'Failed to update post' } });
   }
 });
 
