@@ -8,7 +8,7 @@
 <body>
     <h1>Dashboard</h1>
 
-    <a href="/posts/new">Create New Post</a>
+    <a href="/dashboard/posts/new">Create New Post</a>
 
     <h2>Existing Posts:</h2>
     {{#each posts}}
@@ -18,7 +18,9 @@
         <p>Created at: {{this.createdAt}}</p>
         <p>Author: {{this.user.username}}</p>
         <a href="/dashboard/posts/edit/{{this.id}}">Edit</a>
-        <a href="/dashboard/posts/delete/{{this.id}}">Delete</a>
+        <form action="/dashboard/posts/delete/{{this.id}}" method="post">
+          <input type="submit" value="Delete">
+        </form>
       </div>
     {{/each}}
 

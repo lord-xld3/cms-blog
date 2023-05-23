@@ -13,6 +13,10 @@
         <p>{{post.content}}</p>
         <p>Created at: {{post.createdAt}}</p>
         <p>Author: {{post.user.username}}</p>
+        <a href="/dashboard/posts/edit/{{post.id}}">Edit</a>
+        <form action="/dashboard/posts/delete/{{post.id}}" method="post">
+          <input type="submit" value="Delete">
+        </form>
     </div>
 
     <a href="/dashboard">Go back to Dashboard</a>

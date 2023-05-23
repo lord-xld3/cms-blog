@@ -32,6 +32,26 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Create a new post (render the form)
+router.get('/posts/new', (req, res) => {
+  res.render('newPost');
+});
+
+// Create a new post (handle the form submission)
+router.post('/posts/new', async (req, res) => {
+  try {
+    const { title, content } = req.body;
+    const userId = req.session.userId;
+    
+    const post = await Post.create({ title, content, userId });
+
+    res.redirect(`/dashboard/posts/${post.id}`);
+  } catch (error) {
+    console.error(error);
+    res.render('error', { error: { message: 'Failed to create new post' } });
+  }
+});
+
 // Get a specific post by ID
 router.get('/posts/:id', async (req, res) => {
   try {
@@ -57,28 +77,8 @@ router.get('/posts/:id', async (req, res) => {
   }
 });
 
-// Create a new post (render the form)
-router.get('/posts/new', (req, res) => {
-  res.render('newPost');
-});
-
-// Create a new post (handle the form submission)
-router.post('/posts/new', async (req, res) => {
-  try {
-    const { title, content } = req.body;
-    const userId = req.session.userId;
-    
-    const post = await Post.create({ title, content, userId });
-
-    res.redirect(`/dashboard/posts/${post.id}`);
-  } catch (error) {
-    console.error(error);
-    res.render('error', { error: { message: 'Failed to create new post' } });
-  }
-});
-
 // Delete a post
-router.delete('/posts/:id', async (req, res) => {
+router.post('/posts/delete/:id', async (req, res) => {
   try {
     const postId = req.params.id;
     const post = await Post.findByPk(postId);
@@ -97,12 +97,13 @@ router.delete('/posts/:id', async (req, res) => {
 
     // Delete the post
     await post.destroy();
-    res.sendStatus(204);
+    res.redirect('/dashboard'); // Redirect to the dashboard
   } catch (error) {
     console.error(error);
     res.render('error', { error: { message: 'Failed to delete post' } });
   }
 });
+
 
 
 // Update a post (render the edit post form)
