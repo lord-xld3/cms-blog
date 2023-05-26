@@ -45,4 +45,4 @@ The blogging platform includes the following functionality:
 
 ## Demo
 
-[Website]()
+[Website](https://cms-blog1.herokuapp.com/)
