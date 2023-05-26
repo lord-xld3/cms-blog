@@ -2,9 +2,9 @@ const Sequelize = require('sequelize');
 
 let sequelize;
 
-if (process.env.DATABASE_URL) {
+if (process.env.JAWSDB_URL) {
   // Database connection from Heroku's environment variable
-  sequelize = new Sequelize(process.env.DATABASE_URL, {
+  sequelize = new Sequelize(process.env.JAWSDB_URL, {
     dialect: 'mysql',
     protocol: 'mysql',
     logging: true // Set to true to see database queries in the console
